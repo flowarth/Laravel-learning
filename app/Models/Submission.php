@@ -11,15 +11,15 @@ class Submission extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'assigment_id',
+        'assignment_id',
         'student_id',
         'file_path',
         'score'
     ];
 
-    public function assigment()
+    public function assignment()
     {
-        return $this->belongsTo(Assigment::class);
+        return $this->belongsTo(Assignment::class);
     }
 
     public function student()
