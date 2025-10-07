@@ -3,26 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AssignmentRequest;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Notifications\NewAssignmentNotification;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
 class AssignmentController extends Controller
 {
-    public function store(Request $request)
+    public function store(AssignmentRequest $request, ?Course $course = null)
     {
-        $validated = $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'deadline' => 'required|date|after:now',
-        ]);
-
-        $course = Course::findOrFail($validated['course_id']);
-
         if ($course->lecturer_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
@@ -30,12 +20,12 @@ class AssignmentController extends Controller
             ], 403);
         }
 
-        $assignment = Assignment::create($validated);
+        $assignment = Assignment::create($request);
         $assignment->load('course');
 
         $students = $course->students;
         foreach ($students as $student) {
-            Notification::route('mail', $student->email)->notify(new NewAssignmentNotification($assignment));
+            \Illuminate\Support\defer(fn() => Notification::route('mail', $student->email)->notify(new NewAssignmentNotification($assignment)));
         }
 
         return response()->json([

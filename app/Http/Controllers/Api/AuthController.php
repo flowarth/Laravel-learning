@@ -80,12 +80,4 @@ class AuthController extends Controller
             'message' => 'Logout berhasil'
         ]);
     }
-
-    public function me(Request $request)
-    {
-        return response()->json([
-            'success' => true,
-            'data' => $request->user()
-        ]);
-    }
 }

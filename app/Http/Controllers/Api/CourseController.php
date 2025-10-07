@@ -137,24 +137,4 @@ class CourseController extends Controller
             'data' => $course->load('lecturer')
         ]);
     }
-
-    public function myCourses(Request $request)
-    {
-        $user = $request->user();
-
-        if ($user->isDosen()) {
-            $courses = $user->coursesAsLecturer()
-                ->with('students')
-                ->get();
-        } else {
-            $courses = $user->coursesAsStudent()
-                ->with('lecturer')
-                ->get();
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $courses
-        ]);
-    }
 }
