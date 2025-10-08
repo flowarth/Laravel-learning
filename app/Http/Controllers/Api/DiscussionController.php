@@ -23,6 +23,10 @@ class DiscussionController extends Controller
         ]);
 
         broadcast(new ChatMessageSent($disc))->toOthers();
-        return response()->json($disc, 201);
+        return response()->json([
+            'success' => true,
+            'message' => 'Diskusi berhasil ditambahkan',
+            'data' => $disc
+        ], 201);
     }
 }

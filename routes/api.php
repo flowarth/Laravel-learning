@@ -14,7 +14,7 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('course')->group(function() {
+    Route::prefix('courses')->group(function() {
         Route::get('/', [CourseController::class, 'index']);
         Route::post('/', [CourseController::class, 'store']);
         Route::put('/{id}', [CourseController::class, 'update']);
@@ -25,10 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('materials')->group(function() {
         Route::post('/', [MaterialController::class, 'store']);
         Route::delete('/{id}', [MaterialController::class, 'destroy']);
-        Route::post('/{id}/download', [MaterialController::class, 'download']);
+        Route::get('/{id}/download', [MaterialController::class, 'download']);
     });
 
-    Route::post('assignment', [AssignmentController::class, 'store']);
+    Route::post('assignments', [AssignmentController::class, 'store']);
 
     Route::prefix('submissions')->group(function() {
         Route::post('/', [SubmissionController::class, 'store']);

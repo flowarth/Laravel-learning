@@ -27,7 +27,11 @@ class SubmissionController extends Controller
             'file_path' => $path,
         ]);
 
-        return response()->json($submission, 201);
+        return response()->json([
+            'success' => true,
+            'message' => 'Tugas berhasil dikumpulkan',
+            'data' => $submission
+        ], 201);
     }
 
     public function grade(GradeRequest $request, $id)

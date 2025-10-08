@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Discussion;
-use App\Models\Materials;
+use App\Models\Material;
 use App\Models\Reply;
 use App\Models\Submission;
 use App\Policies\AssignmentPolicy;
@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
     public function registerPolicies(): void
     {
         Gate::policy(Course::class, CoursePolicy::class);
-        Gate::policy(Materials::class, MaterialPolicy::class);
+        Gate::policy(Material::class, MaterialPolicy::class);
         Gate::policy(Assignment::class, AssignmentPolicy::class);
         Gate::policy(Submission::class, SubmissionPolicy::class);
         Gate::policy(Discussion::class, DiscussionPolicy::class);

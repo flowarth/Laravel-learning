@@ -19,6 +19,11 @@ class ReplyController extends Controller
             'content' => $request->content
         ]);
         broadcast(new ReplyMessageSent($reply))->toOthers();
-        return response()->json($reply, 201);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Balasan terkirim',
+            'data' => $reply
+        ], 201);
     }
 }

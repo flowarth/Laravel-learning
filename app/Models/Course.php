@@ -29,7 +29,7 @@ class Course extends Model
 
     public function materials()
     {
-        return $this->hasMany(Materials::class);
+        return $this->hasMany(Material::class);
     }
 
     public function assigments()
