@@ -12,13 +12,10 @@ class DiscussionController extends Controller
 {
     public function store(DiscussionRequest $request)
     {
+        $this->authorize('create', Discussion::class);
+
         $course = Course::findOrFail($request->course_id);
 
-        if ($request->user()->role === 'student' && !$course->students->contains($request->user()->id)) {
-            return response()->json([
-                'message' => 'Must be enrolled to discuss'
-            ], 403);
-        }
         $disc = Discussion::create([
             'course_id' => $course->id,
             'user_id' => $request->user()->id,

@@ -11,6 +11,8 @@ class ReplyController extends Controller
 {
     public function store(ReplyRequest $request, $discussionId)
     {
+        $this->authorize('create', Reply::class);
+
         $reply = Reply::create([
             'discussion_id' => $discussionId,
             'user_id' => $request->user()->id,

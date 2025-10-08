@@ -13,15 +13,13 @@ use Illuminate\Support\Facades\Notification;
 
 class SubmissionController extends Controller
 {
-    public function store(SubmissionRequest $request, ?Assignment $assignment = null)
+    public function store(SubmissionRequest $request)
     {
-        if ($request->user()->role !== 'mahasiswa') {
-            return response()->json([
-                'message' => 'Anda tidak memiliki akses untuk ini'
-            ], 403);
-        }
+        $this->authorize('create', Submission::class);
 
         $path = $request->file('file')->store('submissions', 'public');
+
+        $assignment = Assignment::findOrFail($request->assignment_id);
 
         $submission = Submission::create([
             'assignment_id' => $assignment->id,
@@ -35,11 +33,8 @@ class SubmissionController extends Controller
     public function grade(GradeRequest $request, $id)
     {
         $submission = Submission::findOrFail($id);
-        $assignment = $submission->assignment->course;
 
-        if ($request->user()->id !== $assignment->lecturer_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('grade', $submission);
 
         $submission->score = $request->score;
         $submission->save();

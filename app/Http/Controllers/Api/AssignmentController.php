@@ -11,16 +11,13 @@ use Illuminate\Support\Facades\Notification;
 
 class AssignmentController extends Controller
 {
-    public function store(AssignmentRequest $request, ?Course $course = null)
+    public function store(AssignmentRequest $request)
     {
-        if ($course->lecturer_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki akses untuk membuat tugas di mata kuliah ini'
-            ], 403);
-        }
+        $this->authorize('create', Assignment::class);
 
-        $assignment = Assignment::create($request);
+        $course = Course::findOrFail($request->course_id);
+
+        $assignment = Assignment::create($request->validated());
         $assignment->load('course');
 
         $students = $course->students;

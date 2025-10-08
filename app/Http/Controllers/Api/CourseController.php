@@ -9,18 +9,11 @@ use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = $request->user();
+        $this->authorize('viewAny', Course::class);
 
-        if ($user->isDosen()) {
-            $courses = Course::where('lecturer_id', $user->id)
-                ->with(['lecturer', 'students'])
-                ->paginate(10);
-        } else {
-            $courses = Course::with(['lecturer', 'students'])
-                ->paginate(10);
-        }
+        $courses = Course::with(['lecturer', 'students'])->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -30,12 +23,7 @@ class CourseController extends Controller
 
     public function store(CourseRequest $request)
     {
-        if (!$request->user()->isDosen()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Hanya dosen yang bisa menambahkan mata kuliah'
-            ], 403);
-        }
+        $this->authorize('create', Course::class);
 
         $course = Course::create([
             'name' => $request['name'],
@@ -50,25 +38,11 @@ class CourseController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function update(CourseRequest $request, $id)
     {
-        $course = Course::with(['lecturer', 'students', 'materials', 'assignments'])
-            ->findOrFail($id);
+        $course = Course::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $course
-        ]);
-    }
-
-    public function update(CourseRequest $request, Course $course)
-    {
-        if ($course->lecturer_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki akses untuk mengedit mata kuliah ini'
-            ], 403);
-        }
+        $this->authorize('update', $course);
 
         $course->update($request->validated());
 
@@ -79,14 +53,11 @@ class CourseController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, Course $course)
+    public function destroy($id)
     {
-        if ($course->lecturer_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki akses untuk menghapus mata kuliah ini'
-            ], 403);
-        }
+        $course = Course::findOrFail($id);
+
+        $this->authorize('delete', $course);
 
         $course->delete();
 
@@ -100,14 +71,9 @@ class CourseController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isMahasiswa()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Hanya mahasiswa yang bisa mendaftar mata kuliah'
-            ], 403);
-        }
-
         $course = Course::findOrFail($id);
+
+        $this->authorize('enroll', $course);
 
         if ($course->students()->where('student_id', $user->id)->exists()) {
             return response()->json([

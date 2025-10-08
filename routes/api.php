@@ -16,16 +16,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('course')->group(function() {
         Route::get('/', [CourseController::class, 'index']);
         Route::post('/', [CourseController::class, 'store']);
-        Route::get('/{course}', [CourseController::class, 'show']);
         Route::put('/{course}', [CourseController::class, 'update']);
         Route::delete('/{course}', [CourseController::class, 'destroy']);
-        Route::post('/{id}/enroll', [CourseController::class, 'enroll']);
+        Route::post('/{course}/enroll', [CourseController::class, 'enroll']);
     });
 
     Route::prefix('materials')->group(function() {
-        Route::get('/{id}', [MaterialController::class, 'index']);
         Route::post('/', [MaterialController::class, 'store']);
-        Route::delete('/{id}', [MaterialController::class, 'destroy']);
+        Route::delete('/{materials}', [MaterialController::class, 'destroy']);
         Route::post('/{id}/download', [MaterialController::class, 'download']);
     });
 
