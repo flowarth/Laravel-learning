@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AssignmentController;
 use App\Http\Controllers\Api\SubmissionController;
 use App\Http\Controllers\Api\DiscussionController;
 use App\Http\Controllers\Api\ReplyController;
+use App\Http\Controllers\Api\ReportController;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
@@ -16,14 +17,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('course')->group(function() {
         Route::get('/', [CourseController::class, 'index']);
         Route::post('/', [CourseController::class, 'store']);
-        Route::put('/{course}', [CourseController::class, 'update']);
-        Route::delete('/{course}', [CourseController::class, 'destroy']);
-        Route::post('/{course}/enroll', [CourseController::class, 'enroll']);
+        Route::put('/{id}', [CourseController::class, 'update']);
+        Route::delete('/{id}', [CourseController::class, 'destroy']);
+        Route::post('/{id}/enroll', [CourseController::class, 'enroll']);
     });
 
     Route::prefix('materials')->group(function() {
         Route::post('/', [MaterialController::class, 'store']);
-        Route::delete('/{materials}', [MaterialController::class, 'destroy']);
+        Route::delete('/{id}', [MaterialController::class, 'destroy']);
         Route::post('/{id}/download', [MaterialController::class, 'download']);
     });
 
@@ -37,6 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('discussions', [DiscussionController::class, 'store']);
 
     Route::post('discussions/{id}/replies', [ReplyController::class, 'store']);
+
+    Route::prefix('reports')->group(function() {
+        Route::get('/courses', [ReportController::class, 'courses']);
+        Route::get('/assignments', [ReportController::class, 'assignments']);
+        Route::get('/students/{id}', [ReportController::class, 'student']);
+    });
 
     Route::post('logout', [AuthController::class, 'logout']);
 });
