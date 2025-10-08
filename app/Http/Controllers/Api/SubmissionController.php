@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GradeRequest;
+use App\Http\Requests\SubmissionRequest;
 use App\Models\Assignment;
 use App\Models\Submission;
 use App\Notifications\GradeNotification;
@@ -11,15 +13,8 @@ use Illuminate\Support\Facades\Notification;
 
 class SubmissionController extends Controller
 {
-    public function store(Request $request)
+    public function store(SubmissionRequest $request, ?Assignment $assignment = null)
     {
-        $request->validate([
-            'assignment_id' => 'required|exists:assignments,id',
-            'file' => 'required|file'
-        ]);
-
-        $assignment = Assignment::findOrFail($request->assignment_id);
-
         if ($request->user()->role !== 'mahasiswa') {
             return response()->json([
                 'message' => 'Anda tidak memiliki akses untuk ini'
@@ -37,12 +32,8 @@ class SubmissionController extends Controller
         return response()->json($submission, 201);
     }
 
-    public function grade(Request $request, $id)
+    public function grade(GradeRequest $request, $id)
     {
-        $request->validate([
-            'score' => 'required|integer|min:0|max:100'
-        ]);
-
         $submission = Submission::findOrFail($id);
         $assignment = $submission->assignment->course;
 

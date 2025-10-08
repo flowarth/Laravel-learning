@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CourseRequest;
 use App\Models\Course;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ class CourseController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(CourseRequest $request)
     {
         if (!$request->user()->isDosen()) {
             return response()->json([
@@ -36,14 +37,9 @@ class CourseController extends Controller
             ], 403);
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
         $course = Course::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
+            'name' => $request['name'],
+            'description' => $request['description'],
             'lecturer_id' => $request->user()->id,
         ]);
 
@@ -65,10 +61,8 @@ class CourseController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(CourseRequest $request, Course $course)
     {
-        $course = Course::findOrFail($id);
-
         if ($course->lecturer_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
@@ -76,12 +70,7 @@ class CourseController extends Controller
             ], 403);
         }
 
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $course->update($validated);
+        $course->update($request->validated());
 
         return response()->json([
             'success' => true,
@@ -90,10 +79,8 @@ class CourseController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Course $course)
     {
-        $course = Course::findOrFail($id);
-
         if ($course->lecturer_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,

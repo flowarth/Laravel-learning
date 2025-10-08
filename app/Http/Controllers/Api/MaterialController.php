@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MaterialRequest;
 use App\Models\Course;
 use App\Models\Materials;
 use Illuminate\Http\Request;
@@ -22,16 +23,8 @@ class MaterialController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(MaterialRequest $request, ?Course $course = null)
     {
-        $validated = $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:pdf,doc,docx|max:10240',
-        ]);
-
-        $course = Course::findOrFail($validated['course_id']);
-
         if ($course->lecturer_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
@@ -43,8 +36,8 @@ class MaterialController extends Controller
         $path = $file->store('materials', 'public');
 
         $material = Materials::create([
-            'course_id' => $validated['course_id'],
-            'title' => $validated['title'],
+            'course_id' => $request['course_id'],
+            'title' => $request['title'],
             'file_path' => $path,
         ]);
 
